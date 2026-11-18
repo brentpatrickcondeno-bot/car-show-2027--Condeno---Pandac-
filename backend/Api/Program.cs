@@ -5,6 +5,9 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Api.Features.Registrations;
+using Application.Features.Registrations.CreateRegistration;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +17,13 @@ builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>
 
 // Validators
 builder.Services.AddValidatorsFromAssemblyContaining<IAppDbContext>();
+builder.Services.ConfigureHttpJsonOptions(options =>options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 
 // Handlers
 // builder.Services.AddScoped<ICommandHandler<TCommand, Result<TResponse>>, TCommandHandler>();
 // builder.Services.AddScoped<IQueryHandler<TQuery, Result<TResponse>>, TQueryHandler>();
+builder.Services.AddScoped<ICommandHandler<CreateRegistrationCommand, Result<CreateRegistrationResponse>>, CreateRegistrationCommandHandler>();
 
 // API
 builder.Services.AddEndpointsApiExplorer();
@@ -51,6 +57,6 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => "Welcome to the Car Show Registration API! Go to /scalar/v1 for API documentation.");
 
 // Map endpoints
-// app.MapRegistrationEndpoints();
+app.MapRegistrationEndpoints();
 
 app.Run();
