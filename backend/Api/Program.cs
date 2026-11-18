@@ -10,10 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Database
 builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>
-    options.UseInMemoryDatabase("VerticalSliceDb"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("Database")));
 
 // Validators
-builder.Services.AddValidatorsFromAssembly(typeof(IAppDbContext).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<IAppDbContext>();
 
 // Handlers
 // builder.Services.AddScoped<ICommandHandler<TCommand, Result<TResponse>>, TCommandHandler>();
@@ -25,22 +25,19 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((document, _, _) =>
     {
-        document.Info.Title = "Vertical Slice API Template by Elvin Manuel R. Luces, MIT";
-        document.Info.Description = "A simple API demonstrating Vertical Slice Architecture";
+        document.Info.Title = "Car Show Registration API";
+        document.Info.Description = "Backend API for the Car Show 2027 registration system";
         return Task.CompletedTask;
     });
 });
 
 var app = builder.Build();
 
-// Seed data
+// Apply migrations on startup (seeding is added later in an idempotent seeder)
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    // dbContext.<Entities>.AddRange(...);
-
-    dbContext.SaveChanges();
+    dbContext.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline
@@ -51,9 +48,9 @@ if (app.Environment.IsDevelopment())
 }
 
 // Root endpoint
-app.MapGet("/", () => "Welcome to the Vertical Slice API! Go to /scalar/v1 for API documentation.");
+app.MapGet("/", () => "Welcome to the Car Show Registration API! Go to /scalar/v1 for API documentation.");
 
 // Map endpoints
-// app.Map{FeatureGroup}Endpoints();
+// app.MapRegistrationEndpoints();
 
 app.Run();
