@@ -50,26 +50,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply migrations on startup (seeding is added later in an idempotent seeder)
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}
+app.UseCors("Frontend");
 
-// Configure the HTTP request pipeline
+await app.Services.MigrateAndSeedAsync();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
-// Root endpoint
 app.MapGet("/", () => "Welcome to the Car Show Registration API! Go to /scalar/v1 for API documentation.");
 
-app.UseCors("Frontend");
-
-// Map endpoints
 app.MapRegistrationEndpoints();
 
 app.Run();
