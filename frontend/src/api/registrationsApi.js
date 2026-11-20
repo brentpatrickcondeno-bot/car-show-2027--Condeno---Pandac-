@@ -9,14 +9,13 @@ async function request(path) {
 }
 
 export function getRegistrations({ participantName = '', type = '', status = '', page = 1, pageSize = 10 } = {}) {
-  const query = new URLSearchParams({
-    participantName,
-    type,
-    status,
-    page: String(page),
-    pageSize: String(pageSize),
-  })
-  return request(`/api/registrations?${query.toString()}`)
+  const params = new URLSearchParams()
+  if (participantName) params.set('participantName', participantName)
+  if (type) params.set('type', type)
+  if (status) params.set('status', status)
+  params.set('page', String(page))
+  params.set('pageSize', String(pageSize))
+  return request(`/api/registrations?${params.toString()}`)
 }
 
 export function getSummary() {

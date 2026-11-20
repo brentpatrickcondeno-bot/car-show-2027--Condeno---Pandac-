@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getRegistrations, getSummary } from '../api/sample-data'
+import { getRegistrations, getSummary } from '../api/registrationsApi'
 import KpiCards from '../components/KpiCards'
 import Pagination from '../components/Pagination'
 import RegistrationFilters from '../components/RegistrationFilters'
@@ -88,7 +88,7 @@ export default function RegistrationsPage() {
           <h1>Registration dashboard</h1>
           <p className="page-description">A clear view of participants, vehicle entries, confirmation status, and payments for event staff.</p>
         </div>
-        <div className="data-source"><i className="bi bi-database-check" aria-hidden="true" /> Sample data · API-ready contract</div>
+        <div className="data-source"><i className="bi bi-database-check" aria-hidden="true" /> Live API</div>
       </div>
       <KpiCards summary={summary} />
       <RegistrationFilters filters={filters} onChange={handleFilterChange} onClear={clearFilters} />

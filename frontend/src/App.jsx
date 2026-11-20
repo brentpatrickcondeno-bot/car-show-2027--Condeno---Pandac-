@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './App.css'
 import RegistrationsPage from './pages/RegistrationsPage'
 
 function App() {
