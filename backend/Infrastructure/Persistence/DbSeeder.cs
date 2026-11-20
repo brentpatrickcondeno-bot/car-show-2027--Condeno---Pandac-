@@ -43,7 +43,7 @@ public static class DbSeeder
             RegistrationStatus.CheckedIn, RegistrationStatus.Cancelled
         };
 
-        var start = new DateTime(2027, 1, 10, 8, 0, 0, DateTimeKind.Utc);
+        var start = new DateTime(2026, 10, 1, 8, 0, 0, DateTimeKind.Utc);
         var list = new List<Registration>();
 
         for (var i = 0; i < names.Length; i++)
