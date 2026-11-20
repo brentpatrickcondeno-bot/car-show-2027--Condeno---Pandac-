@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getRegistrations, getSummary } from '../api/registrationsApi'
 import KpiCards from '../components/KpiCards'
 import Pagination from '../components/Pagination'
@@ -42,9 +42,12 @@ export default function RegistrationsPage() {
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
   const debouncedName = useDebounce(filters.participantName)
+  const cancelledRef = useRef(false)
 
   const loadData = useCallback(async () => {
+    cancelledRef.current = false
     setLoading(true)
     setError(null)
     try {
@@ -52,17 +55,23 @@ export default function RegistrationsPage() {
         getRegistrations({ ...filters, participantName: debouncedName, page, pageSize }),
         getSummary(),
       ])
+      if (cancelledRef.current) return
       setResult(registrationResult)
       setSummary(summaryResult)
     } catch (requestError) {
+      if (cancelledRef.current) return
       setError(requestError)
+      setSummary(null)
     } finally {
+      if (cancelledRef.current) return
       setLoading(false)
     }
-  }, [debouncedName, filters, page, pageSize])
+  }, [debouncedName, filters, page, pageSize, retryCount])
 
   useEffect(() => {
+    cancelledRef.current = false
     loadData()
+    return () => { cancelledRef.current = true }
   }, [loadData])
 
   function handleFilterChange(name, value) {
@@ -99,7 +108,7 @@ export default function RegistrationsPage() {
             <p className="table-subtitle">Review entries and payment status before the event.</p>
           </div>
         </div>
-        {error ? <ErrorState onRetry={loadData} /> : result.totalCount === 0 && !loading ? <EmptyState onClear={clearFilters} /> : <RegistrationTable loading={loading} registrations={result.items} />}
+        {error ? <ErrorState onRetry={() => setRetryCount(c => c + 1)} /> : result.totalCount === 0 && !loading ? <EmptyState onClear={clearFilters} /> : <RegistrationTable loading={loading} registrations={result.items} />}
         {!error && result.totalCount > 0 && (
           <Pagination
             loading={loading}
