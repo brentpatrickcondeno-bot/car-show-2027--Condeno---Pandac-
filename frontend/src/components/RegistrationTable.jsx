@@ -45,7 +45,7 @@ export default function RegistrationTable({ registrations, loading }) {
                 <span className="car-name">{registration.carMakeModel}</span>
                 <span className="plate-number">{registration.plateNumber}</span>
               </td>
-              <td><span className="type-badge">{registration.registrationType}</span></td>
+              <td><span className={`type-badge ${registration.registrationType.toLowerCase()}`}>{registration.registrationType}</span></td>
               <td><StatusBadge status={registration.status} /></td>
               <td className="amount-cell">
                 {peso.format(registration.registrationFee)}
